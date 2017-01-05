@@ -23,6 +23,7 @@ class UserProfile(models.Model):
     auth_id = models.CharField(
         default='',
         max_length=75,
+        unique=True,
         verbose_name='Firebase ID')
     image = FilerImageField(
         related_name="user_image",
@@ -53,7 +54,7 @@ class Category(models.Model):
     """
     Description: Represent a single category.
     """
-    name = models.CharField(default='', max_length=50)
+    name = models.CharField(default='', max_length=50, unique=True)
 
     class Meta:
         verbose_name = 'Category'
@@ -67,7 +68,7 @@ class Ingredient(models.Model):
     """
     Description: Represent a single ingredient.
     """
-    name = models.CharField(default='', max_length=50)
+    name = models.CharField(default='', max_length=50, unique=True)
     is_allergic = models.BooleanField(default=False)
     unit = models.CharField(default='', max_length=10)
 
@@ -89,7 +90,7 @@ class Region(models.Model):
     """
     Description: Represent a single region.
     """
-    name = models.CharField(default='', max_length=50)
+    name = models.CharField(default='', max_length=50, unique=True)
 
     def __unicode__(self):
         return self.name
@@ -99,7 +100,7 @@ class Holiday(models.Model):
     """
     Description: Represent a single region.
     """
-    name = models.CharField(default='', max_length=50)
+    name = models.CharField(default='', max_length=50, unique=True)
 
     def __unicode__(self):
         return self.name
@@ -109,12 +110,15 @@ class Rating(models.Model):
     """
     Description: Represent a single rating object.
     """
-    user = models.ForeignKey(settings.AUTH_USER_MODEL)
+    user = models.ForeignKey(UserProfile)
     recipe = models.ForeignKey('Recipe', related_name='ratings')
     value = models.DecimalField(
         default=0.0,
         max_digits=5,
         decimal_places=1)
+
+    class Meta:
+        unique_together = (('user', 'recipe', 'value'),)
 
     def __unicode__(self):
         return str(self.value)
@@ -124,7 +128,7 @@ class Dish(models.Model):
     """
     Description: Represent a single region.
     """
-    name = models.CharField(default='', max_length=50)
+    name = models.CharField(default='', max_length=50, unique=True)
 
     class Meta:
         verbose_name = 'Dish'
@@ -148,6 +152,7 @@ class Recipe(models.Model):
     """
     name = models.CharField(
         default='',
+        unique=True,
         max_length=100)
 
     ingredients = models.ManyToManyField(
@@ -162,7 +167,7 @@ class Recipe(models.Model):
 
     servings = models.PositiveSmallIntegerField(default=1)
     is_approved = models.BooleanField(default=False)
-    user = models.ForeignKey(settings.AUTH_USER_MODEL)
+    user = models.ForeignKey(UserProfile)
     category = models.ForeignKey(Category)
     region = models.ForeignKey(Region, verbose_name='Region')
     duration = models.CharField(default='', max_length=20)
@@ -212,6 +217,9 @@ class RecipeIngredient(models.Model):
 
     quantity = models.CharField(default='', max_length=10)
 
+    class Meta:
+        unique_together = (('ingredient', 'recipe', 'quantity'), )
+
     def __unicode__(self):
         return u'{} {} {}'.format(self.ingredient.name, self.quantity, self.ingredient.unit)
 
@@ -221,7 +229,7 @@ class Comment(models.Model):
     Description: Represent a single comment.
     """
     recipe = models.ForeignKey(Recipe)
-    user = models.ForeignKey(settings.AUTH_USER_MODEL)
+    user = models.ForeignKey(UserProfile)
     date = models.DateField(auto_now_add=True)
 
     def __unicode__(self):

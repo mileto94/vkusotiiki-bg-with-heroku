@@ -14,15 +14,6 @@ DIFFICULTIES = (
     (5, '5')
 )
 
-# class UserProxy:
-#     class Meta:
-#         model = User
-#         proxy = True
-
-#     @property
-#     def full_name(self):
-#         return '{} {}'.format(self.first_name, self.last_name)
-
 
 class UserProfile(models.Model):
     """
@@ -54,7 +45,7 @@ class UserProfile(models.Model):
         max_length=200,
         verbose_name='Address for business users.')
 
-    def __str__(self):
+    def __unicode__(self):
         return self.user.get_full_name()
 
 
@@ -68,7 +59,7 @@ class Category(models.Model):
         verbose_name = 'Category'
         verbose_name_plural = 'Categories'
 
-    def __str__(self):
+    def __unicode__(self):
         return self.name
 
 
@@ -80,7 +71,7 @@ class Ingredient(models.Model):
     is_allergic = models.BooleanField(default=False)
     unit = models.CharField(default='', max_length=10)
 
-    def __str__(self):
+    def __unicode__(self):
         return self.name
 
     @property
@@ -100,7 +91,7 @@ class Region(models.Model):
     """
     name = models.CharField(default='', max_length=50)
 
-    def __str__(self):
+    def __unicode__(self):
         return self.name
 
 
@@ -110,7 +101,7 @@ class Holiday(models.Model):
     """
     name = models.CharField(default='', max_length=50)
 
-    def __str__(self):
+    def __unicode__(self):
         return self.name
 
 
@@ -125,7 +116,7 @@ class Rating(models.Model):
         max_digits=5,
         decimal_places=1)
 
-    def __str__(self):
+    def __unicode__(self):
         return str(self.value)
 
 
@@ -139,7 +130,7 @@ class Dish(models.Model):
         verbose_name = 'Dish'
         verbose_name_plural = 'Dishes'
 
-    def __str__(self):
+    def __unicode__(self):
         return self.name
 
 
@@ -194,7 +185,7 @@ class Recipe(models.Model):
         auto_now=True,
         verbose_name='Date modified')
 
-    def __str__(self):
+    def __unicode__(self):
         return self.name
 
     @property
@@ -221,8 +212,8 @@ class RecipeIngredient(models.Model):
 
     quantity = models.CharField(default='', max_length=10)
 
-    def __str__(self):
-        return '{} {} {}'.format(self.ingredient.name, self.quantity, self.ingredient.unit)
+    def __unicode__(self):
+        return u'{} {} {}'.format(self.ingredient.name, self.quantity, self.ingredient.unit)
 
 
 class Comment(models.Model):
@@ -233,5 +224,5 @@ class Comment(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL)
     date = models.DateField(auto_now_add=True)
 
-    def __str__(self):
+    def __unicode__(self):
         return self.recipe

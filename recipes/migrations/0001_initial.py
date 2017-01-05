@@ -12,10 +12,10 @@ class Migration(migrations.Migration):
 
     initial = True
 
-    # dependencies = [
-    #     ('filer', '0007_auto_20161217_1529'),
-    #     migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-    # ]
+    dependencies = [
+        ('filer', '0006_auto_20160623_1627'),
+        migrations.swappable_dependency(settings.AUTH_USER_MODEL),
+    ]
 
     operations = [
         migrations.CreateModel(

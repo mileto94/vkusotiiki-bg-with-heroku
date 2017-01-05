@@ -34,10 +34,13 @@ class UserSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         print(validated_data)
         userprofile = validated_data.pop('userprofile')
-        user, _ = User.objects.get_or_create(email=validated_data.get('email'))
+        user, _ = User.objects.get_or_create(
+            email=validated_data.get('email'),
+            defaults=validated_data
+        )
         if UserProfile.objects.filter(
             auth_id=userprofile.get('auth_id', None),
-            user__email=user.email).exiists():
+            user__email=user.email).exists():
             print('haaaaaaaaaaaaaaaaaaaaaa')
 
 

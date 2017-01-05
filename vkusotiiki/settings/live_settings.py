@@ -11,12 +11,21 @@ https://docs.djangoproject.com/en/1.9/ref/settings/
 """
 
 from .base_settings import *
-import dj_database_url
 
 
 # Database
 # https://docs.djangoproject.com/en/1.9/ref/settings/#databases
-DATABASES = {'default': dj_database_url.config()}
+DATABASES = {
+    'default': {
+        'ENGINE':  'django.db.backends.postgresql_psycopg2',
+        'NAME':    'd955nv8f746vem',
+        'USER':     'aptaafqenmmjcs',
+        'PASSWORD': '6ec1b9d6aea75876d9e421c0b6e994eb4d2b740e623d509e9eed90d08b20014e',
+        'HOST': 'ec2-54-235-245-255.compute-1.amazonaws.com',
+        # 'PORT': 3352  # mysql
+        'PORT': 5432  # postgres
+    }
+}
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'dn0#iyk_ct_@_c0o=u%%ow0^i=1-!&+d^6r_31sp4tf&r*f2%0'

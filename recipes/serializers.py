@@ -102,7 +102,7 @@ class RecipeSerializer(serializers.ModelSerializer):
         model = Recipe
         fields = (
             'name', 'description', 'duration', 'difficulty', 'servings',
-            'user', 'category', 'dish', 'region', 'ingredients',
+            'user', 'category', 'dish', 'region', 'ingredients', 'id'
         )
         # fields = '__all__'
 

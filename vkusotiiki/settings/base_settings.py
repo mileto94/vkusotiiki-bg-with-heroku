@@ -51,11 +51,13 @@ INSTALLED_APPS = [
     'recipes',
 ]
 
-CORS_ORIGIN_WHITELIST = (
-    'vkusotiiki-bg.firebaseapp.com'
-    'localhost:8000',
-    '127.0.0.1:9000'
-)
+# CORS_ORIGIN_WHITELIST = (
+#     'vkusotiiki-bg.firebaseapp.com'
+#     'localhost:8000',
+#     '127.0.0.1:9000'
+# )
+CORS_ORIGIN_ALLOW_ALL = True
+
 
 MIDDLEWARE_CLASSES = [
     'django.middleware.security.SecurityMiddleware',

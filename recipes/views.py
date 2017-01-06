@@ -203,7 +203,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
 
         # Validate Ingredients
         for ingr_data in ingredients_data:
-            quantity = ingr_data.pop('quantity')
+            quantity = ingr_data.get('quantity')
             ingredient, ingr_created = Ingredient.objects.get_or_create(
                 name=ingr_data.get('name'),
                 defaults={

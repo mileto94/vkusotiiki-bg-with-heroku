@@ -12,6 +12,7 @@ class RegionSerializer(serializers.ModelSerializer):
 
 
 class UserProfileSerializer(serializers.ModelSerializer):
+    user = UserProfile()
     location = RegionSerializer(required=False)
     # add image serializer
 
@@ -100,8 +101,9 @@ class RecipeSerializer(serializers.ModelSerializer):
         model = Recipe
         fields = (
             'name', 'description', 'duration', 'difficulty', 'servings',
-            'user', 'category', 'dish', 'holiday', 'region', 'ingredients',
+            'user', 'category', 'dish', 'region', 'ingredients',
         )
+        # fields = '__all__'
 
 
 class RecipeIngredientSerializer(serializers.HyperlinkedModelSerializer):

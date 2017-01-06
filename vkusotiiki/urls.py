@@ -25,6 +25,7 @@ from recipes import views
 
 router = routers.DefaultRouter()
 router.register(r'user', views.UserViewSet)
+router.register(r'userprofile', views.UserProfileViewSet)
 router.register(r'ingredient', views.IngredientViewSet)
 router.register(r'category', views.CategoryViewSet)
 router.register(r'region', views.RegionViewSet)

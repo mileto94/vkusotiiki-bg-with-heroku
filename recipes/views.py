@@ -14,12 +14,146 @@ from django.shortcuts import HttpResponse
 from firebase.firebase import FirebaseApplication
 
 
+class UserProfileViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows users to be viewed or edited.
+    """
+    queryset = UserProfile.objects.all().order_by('-date_joined')
+    serializer_class = UserProfileSerializer
+
+    def create(self, request, *args, **kwargs):
+        data = request.data.copy()
+        email = data.get('email')
+        first_name, last_name = data.get('name', '').split(' ')
+        user, cr = User.objects.get_or_create(email=email, defaults={
+            'first_name': first_name,
+            'last_name': last_name,
+        })
+        region, r_cr = Region.objects.get_or_create(
+            name=data.get('name')
+        )
+        userprofile, pr_cr = UserProfile.objects.get_or_create(
+            user=user,
+            defaults={
+                'location': region,
+                'auth_id': data.get('id')
+            }
+        )
+        request.data['userprofile'] = userprofile
+
+        # Validate Recipe
+        profile_serializer = UserProfileSerializer(data=request.data)
+        if profile_serializer.is_valid():
+            return Response(profile_serializer.data, status=status.HTTP_201_CREATED)
+        return Response(
+            profile_serializer.errors,
+            status=status.HTTP_400_BAD_REQUEST)
+
+
 class UserViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows users to be viewed or edited.
     """
     queryset = User.objects.all().order_by('-date_joined')
     serializer_class = UserSerializer
+
+    def create(self, request, *args, **kwargs):
+        data = request.data.copy()
+        email = data.get('email')
+        first_name, last_name = data.get('name', '').split(' ')
+        user, cr = User.objects.get_or_create(email=email, defaults={
+            'first_name': first_name,
+            'last_name': last_name,
+        })
+        region, r_cr = Region.objects.get_or_create(
+            name=data.get('name')
+        )
+        userprofile, pr_cr = UserProfile.objects.get_or_create(
+            user=user,
+            defaults={
+                'region': region,
+                'auth_id': data.get('id')
+            }
+        )
+        request.data['userprofile'] = userprofile
+        # userprofile = data.pop('userprofile')
+        # user, _ = User.objects.get_or_create(
+        #     email=validated_data.get('email'),
+        #     defaults=validated_data
+        # )
+        # if UserProfile.objects.filter(
+        #     auth_id=userprofile.get('auth_id', None),
+        #     user__email=user.email).exists():
+        #     print('haaaaaaaaaaaaaaaaaaaaaa')
+
+        # # Validate Holiday
+        # if 'holiday' in data.keys():
+        #     holiday = Holiday.objects.filter(id=data.get('holiday')).first()
+        #     if holiday:
+        #         data['holiday'] = holiday
+        #     else:
+        #         return Response(
+        #             [{'holiday': 'Holiday with this ID does not exist!'}],
+        #             status=status.HTTP_400_BAD_REQUEST)
+
+        # # Validate UserProfile
+        # user_ser = UserProfileSerializer(data={'auth_id': data.get('user')})
+        # user_ser.is_valid(raise_exception=True)
+        # user = UserProfile.objects.get(auth_id=data.get('user'))
+        # data['user'], request.data['user'] = user, user.id
+
+        # # Validate Region
+        # region = Region.objects.filter(id=data.get('region')).first()
+        # if region:
+        #     data['region'] = region
+        # else:
+        #     return Response(
+        #         [{'region': 'Region with this ID does not exist!'}],
+        #         status=status.HTTP_400_BAD_REQUEST)
+
+        # # Validate Dish
+        # dish = Dish.objects.filter(id=data.get('dish')).first()
+        # if dish:
+        #     data['dish'] = dish
+        # else:
+        #     return Response(
+        #         [{'dish': 'Dish with this ID does not exist!'}],
+        #         status=status.HTTP_400_BAD_REQUEST)
+
+        # # Validate Category
+        # category = Category.objects.filter(id=data.get('category')).first()
+        # if category:
+        #     data['category'] = category
+        # else:
+        #     return Response(
+        #         [{'category': 'Category with this ID does not exist!'}],
+        #         status=status.HTTP_400_BAD_REQUEST)
+
+        # # Create Recipe
+        # recipe, rec_created = Recipe.objects.get_or_create(**data)
+
+        # # Validate Ingredients
+        # for ingr_data in ingredients_data:
+        #     quantity = ingr_data.pop('quantity')
+        #     ingredient, ingr_created = Ingredient.objects.get_or_create(
+        #         name=ingr_data.get('name'),
+        #         defaults={
+        #             'unit': ingr_data.get('unit'),
+        #             'is_allergic': ingr_data.get('is_allergic')
+        #         }
+        #     )
+        #     rec_ingr, cr = RecipeIngredient.objects.get_or_create(
+        #         recipe=recipe,
+        #         ingredient=ingredient,
+        #         quantity=quantity)
+
+        # # Validate Recipe
+        # recipe_serializer = RecipeSerializer(data=request.data)
+        # if recipe_serializer.is_valid():
+        #     return Response(recipe_serializer.data, status=status.HTTP_201_CREATED)
+        # return Response(
+        #     recipe_serializer.errors,
+        #     status=status.HTTP_400_BAD_REQUEST)
 
 
 class IngredientViewSet(viewsets.ModelViewSet):
@@ -113,13 +247,14 @@ class RecipeViewSet(viewsets.ModelViewSet):
         ingredients_data = data.pop('ingredients', {})
 
         # Validate Holiday
-        holiday = Holiday.objects.filter(id=data.get('holiday')).first()
-        if holiday:
-            data['holiday'] = holiday
-        else:
-            return Response(
-                [{'holiday': 'Holiday with this ID does not exist!'}],
-                status=status.HTTP_400_BAD_REQUEST)
+        if 'holiday' in data.keys():
+            holiday = Holiday.objects.filter(id=data.get('holiday')).first()
+            if holiday:
+                data['holiday'] = holiday
+            else:
+                return Response(
+                    [{'holiday': 'Holiday with this ID does not exist!'}],
+                    status=status.HTTP_400_BAD_REQUEST)
 
         # Validate UserProfile
         user_ser = UserProfileSerializer(data={'auth_id': data.get('user')})

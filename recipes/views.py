@@ -162,6 +162,8 @@ class RecipeViewSet(viewsets.ModelViewSet):
                 return Response(
                     [{'holiday': 'Holiday with this ID does not exist!'}],
                     status=status.HTTP_400_BAD_REQUEST)
+        else:
+            request.data['holiday'] = None
 
         # Validate UserProfile
         user_ser = UserProfileSerializer(data={'auth_id': data.get('user')})
@@ -217,7 +219,9 @@ class RecipeViewSet(viewsets.ModelViewSet):
         # Validate Recipe
         recipe_serializer = RecipeSerializer(data=request.data)
         if recipe_serializer.is_valid():
-            return Response(recipe_serializer.data, status=status.HTTP_201_CREATED)
+            validated = recipe_serializer.data.copy()
+            validated['id'] = recipe.id
+            return Response(validated, status=status.HTTP_201_CREATED)
         return Response(
             recipe_serializer.errors,
             status=status.HTTP_400_BAD_REQUEST)

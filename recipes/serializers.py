@@ -42,17 +42,17 @@ class UserSerializer(serializers.ModelSerializer):
             'url', 'first_name', 'last_name', 'username', 'email', #'full_name',
             'groups', 'userprofile', 'is_superuser', 'is_staff')
 
-    def create(self, validated_data):
-        print(validated_data)
-        userprofile = validated_data.pop('userprofile')
-        user, _ = User.objects.get_or_create(
-            email=validated_data.get('email'),
-            defaults=validated_data
-        )
-        if UserProfile.objects.filter(
-            auth_id=userprofile.get('auth_id', None),
-            user__email=user.email).exists():
-            print('haaaaaaaaaaaaaaaaaaaaaa')
+    # def create(self, validated_data):
+    #     print(validated_data)
+    #     userprofile = validated_data.pop('userprofile')
+    #     user, _ = User.objects.get_or_create(
+    #         email=validated_data.get('email'),
+    #         defaults=validated_data
+    #     )
+    #     if UserProfile.objects.filter(
+    #         auth_id=userprofile.get('auth_id', None),
+    #         user__email=user.email).exists():
+    #         print('haaaaaaaaaaaaaaaaaaaaaa')
 
 
 class IngredientSerializer(serializers.ModelSerializer):
@@ -100,11 +100,11 @@ class RecipeSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Recipe
-        fields = (
-            'name', 'description', 'duration', 'difficulty', 'servings',
-            'user', 'category', 'dish', 'region', 'ingredients', 'id'
-        )
-        # fields = '__all__'
+        # fields = (
+        #     'name', 'description', 'duration', 'difficulty', 'servings',
+        #     'user', 'category', 'dish', 'region', 'ingredients'
+        # )
+        fields = '__all__'
 
 
 class RecipeIngredientSerializer(serializers.HyperlinkedModelSerializer):

@@ -52,7 +52,7 @@ INSTALLED_APPS = [
 ]
 
 CORS_ORIGIN_WHITELIST = (
-    'vkusotiiki-bg.firebase.com',
+    'vkusotiiki-bg.firebaseapp.com'
     'localhost:8000',
     '127.0.0.1:9000'
 )

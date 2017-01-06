@@ -1,12 +1,17 @@
 from django.contrib.auth.models import User
-from rest_framework import viewsets
+from rest_framework import viewsets, status
+from rest_framework.response import Response
 from .serializers import UserSerializer, CategorySerializer, \
     IngredientSerializer, RegionSerializer, DishSerializer, \
     RatingSerializer, RecipeSerializer, \
-    RecipeIngredientSerializer, HolidaySerializer
+    RecipeIngredientSerializer, HolidaySerializer, \
+    UserProfileSerializer
 
 from .models import Ingredient, Category, Region, Dish, \
-    Rating, Recipe, RecipeIngredient, Holiday
+    Rating, Recipe, RecipeIngredient, Holiday, UserProfile
+
+from django.shortcuts import HttpResponse
+from firebase.firebase import FirebaseApplication
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -23,6 +28,27 @@ class IngredientViewSet(viewsets.ModelViewSet):
     """
     queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
+
+    def list(self, request):
+        serializer = IngredientSerializer(Ingredient.objects.all())
+        print('ingredient LIST')
+        return Response(serializer.data)
+
+    def update(self, request, pk=None):
+        print('ingredient Update')
+        if pk:
+            ingredient = Ingredient.objects.get(pk=pk)
+            ingredient.is_allergic = request.data.get('is_allergic', ingredient.is_allergic)
+            ingredient.unit = request.data.get('unit', ingredient.unit)
+            ingredient.save()
+            return Response(ingredient, status=status.HTTP_201_CREATED)
+        return Response(
+            # recipe_serializer.errors,
+            'Update ingredient',
+            status=status.HTTP_400_BAD_REQUEST)
+
+    def create(self, request, *args, **kwargs):
+        print('Ingr. create')
 
 
 class CategoryViewSet(viewsets.ModelViewSet):
@@ -72,6 +98,88 @@ class RecipeViewSet(viewsets.ModelViewSet):
     queryset = Recipe.objects.all()
     serializer_class = RecipeSerializer
 
+    def list(self, request):
+        serializer = RecipeSerializer(
+            Recipe.objects.all(), many=True
+        )
+        return Response(serializer.data)
+
+    # def update(self, request, pk=None):
+    #     print('RECIPE Update')
+    #     pass
+
+    def create(self, request, *args, **kwargs):
+        data = request.data.copy()
+        ingredients_data = data.pop('ingredients', {})
+
+        # Validate Holiday
+        holiday = Holiday.objects.filter(id=data.get('holiday')).first()
+        if holiday:
+            data['holiday'] = holiday
+        else:
+            return Response(
+                [{'holiday': 'Holiday with this ID does not exist!'}],
+                status=status.HTTP_400_BAD_REQUEST)
+
+        # Validate UserProfile
+        user_ser = UserProfileSerializer(data={'auth_id': data.get('user')})
+        user_ser.is_valid(raise_exception=True)
+        user = UserProfile.objects.get(auth_id=data.get('user'))
+        data['user'], request.data['user'] = user, user.id
+
+        # Validate Region
+        region = Region.objects.filter(id=data.get('region')).first()
+        if region:
+            data['region'] = region
+        else:
+            return Response(
+                [{'region': 'Region with this ID does not exist!'}],
+                status=status.HTTP_400_BAD_REQUEST)
+
+        # Validate Dish
+        dish = Dish.objects.filter(id=data.get('dish')).first()
+        if dish:
+            data['dish'] = dish
+        else:
+            return Response(
+                [{'dish': 'Dish with this ID does not exist!'}],
+                status=status.HTTP_400_BAD_REQUEST)
+
+        # Validate Category
+        category = Category.objects.filter(id=data.get('category')).first()
+        if category:
+            data['category'] = category
+        else:
+            return Response(
+                [{'category': 'Category with this ID does not exist!'}],
+                status=status.HTTP_400_BAD_REQUEST)
+
+        # Create Recipe
+        recipe, rec_created = Recipe.objects.get_or_create(**data)
+
+        # Validate Ingredients
+        for ingr_data in ingredients_data:
+            quantity = ingr_data.pop('quantity')
+            ingredient, ingr_created = Ingredient.objects.get_or_create(
+                name=ingr_data.get('name'),
+                defaults={
+                    'unit': ingr_data.get('unit'),
+                    'is_allergic': ingr_data.get('is_allergic')
+                }
+            )
+            rec_ingr, cr = RecipeIngredient.objects.get_or_create(
+                recipe=recipe,
+                ingredient=ingredient,
+                quantity=quantity)
+
+        # Validate Recipe
+        recipe_serializer = RecipeSerializer(data=request.data)
+        if recipe_serializer.is_valid():
+            return Response(recipe_serializer.data, status=status.HTTP_201_CREATED)
+        return Response(
+            recipe_serializer.errors,
+            status=status.HTTP_400_BAD_REQUEST)
+
 
 class RecipeIngredientViewSet(viewsets.ModelViewSet):
     """
@@ -80,8 +188,7 @@ class RecipeIngredientViewSet(viewsets.ModelViewSet):
     queryset = RecipeIngredient.objects.all()
     serializer_class = RecipeIngredientSerializer
 
-from django.shortcuts import HttpResponse
-from firebase.firebase import FirebaseApplication
+
 def test_firebase(request):
     firebase_db = FirebaseApplication('https://vkusotiiki-bg.firebaseio.com/', None)  # no authentication
     users = firebase_db.get('/User', None)

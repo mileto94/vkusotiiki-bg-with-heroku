@@ -1,5 +1,5 @@
 from django.contrib.auth.models import User
-from rest_framework import serializers
+from rest_framework import serializers, validators
 
 from .models import Ingredient, Category, Region, Dish, Rating, \
     Recipe, RecipeIngredient, Holiday, UserProfile
@@ -12,14 +12,23 @@ class RegionSerializer(serializers.ModelSerializer):
 
 
 class UserProfileSerializer(serializers.ModelSerializer):
-    location = RegionSerializer()
+    location = RegionSerializer(required=False)
     # add image serializer
 
     class Meta:
         model = UserProfile
         fields = (
             'auth_id', 'is_business', 'phone_number', 'address',
-            'location', 'image')
+            'location')
+
+    def validate(self, attrs):
+        print(attrs)
+        user = UserProfile.objects.filter(auth_id=attrs.get('auth_id', None)).first()
+        print(user)
+        if not user:
+            raise serializers.ValidationError(
+                {'user': 'UserProfile with this Firebase ID does not exist!'})
+        return attrs
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -64,10 +73,7 @@ class DishSerializer(serializers.HyperlinkedModelSerializer):
         fields = '__all__'
 
 
-class HolidaySerializer(serializers.HyperlinkedModelSerializer):
-    def validate_name(self, name):
-        pass
-
+class HolidaySerializer(serializers.ModelSerializer):
     class Meta:
         model = Holiday
         fields = '__all__'
@@ -94,25 +100,8 @@ class RecipeSerializer(serializers.ModelSerializer):
         model = Recipe
         fields = (
             'name', 'description', 'duration', 'difficulty', 'servings',
-            'user', 'category', 'dish', 'holiday', 'region', 'ingredients'
+            'user', 'category', 'dish', 'holiday', 'region', 'ingredients',
         )
-
-    def create(self, validated_data):
-        ingredients_data = validated_data.pop('ingredients')
-        holiday_name = validated_data.pop('holiday', None)
-        recipe, rec_created = Recipe.objects.get_or_create(**validated_data)
-        if holiday_name is not None:
-            holiday, h_ = Holiday.objects.get_or_create(name=holiday_name)
-            recipe.holiday = holiday
-            recipe.save()
-        for ingr_data in ingredients_data:
-            quantity = ingr_data.pop('quantity')
-            ingredient, ingr_created = Ingredient.objects.get_or_create(**ingr_data)
-            rec_ingr, cr = RecipeIngredient.objects.get_or_create(
-                recipe=recipe,
-                ingredient=ingredient,
-                quantity=quantity)
-        return recipe
 
 
 class RecipeIngredientSerializer(serializers.HyperlinkedModelSerializer):

@@ -22,7 +22,6 @@ class UserProfile(models.Model):
     auth_id = models.CharField(
         default='',
         max_length=75,
-        unique=True,
         verbose_name='Firebase ID')
     image = FilerImageField(
         related_name="user_image",
@@ -56,7 +55,7 @@ class Category(models.Model):
     """
     Description: Represent a single category.
     """
-    name = models.CharField(default='', max_length=50, unique=True)
+    name = models.CharField(default='', max_length=50)
 
     class Meta:
         verbose_name = 'Category'
@@ -73,7 +72,7 @@ class Ingredient(models.Model):
     """
     Description: Represent a single ingredient.
     """
-    name = models.CharField(default='', max_length=50, unique=True)
+    name = models.CharField(default='', max_length=50)
     is_allergic = models.BooleanField(default=False)
     unit = models.CharField(default='', max_length=10)
 
@@ -98,7 +97,7 @@ class Region(models.Model):
     """
     Description: Represent a single region.
     """
-    name = models.CharField(default='', max_length=50, unique=True)
+    name = models.CharField(default='', max_length=50)
 
     def __unicode__(self):
         return self.name
@@ -111,7 +110,7 @@ class Holiday(models.Model):
     """
     Description: Represent a single region.
     """
-    name = models.CharField(default='', max_length=50, unique=True)
+    name = models.CharField(default='', max_length=50)
 
     def __unicode__(self):
         return self.name
@@ -131,9 +130,6 @@ class Rating(models.Model):
         max_digits=5,
         decimal_places=1)
 
-    class Meta:
-        unique_together = (('user', 'recipe', 'value'),)
-
     def __unicode__(self):
         return str(self.value)
 
@@ -145,7 +141,7 @@ class Dish(models.Model):
     """
     Description: Represent a single region.
     """
-    name = models.CharField(default='', max_length=50, unique=True)
+    name = models.CharField(default='', max_length=50)
 
     class Meta:
         verbose_name = 'Dish'
@@ -172,7 +168,6 @@ class Recipe(models.Model):
     """
     name = models.CharField(
         default='',
-        unique=True,
         max_length=100)
 
     ingredients = models.ManyToManyField(
@@ -239,9 +234,6 @@ class RecipeIngredient(models.Model):
         on_delete=models.CASCADE)
 
     quantity = models.CharField(default='', max_length=10)
-
-    class Meta:
-        unique_together = (('ingredient', 'recipe', 'quantity'), )
 
     def __unicode__(self):
         return u'{} {} {}'.format(self.ingredient.name, self.quantity, self.ingredient.unit)

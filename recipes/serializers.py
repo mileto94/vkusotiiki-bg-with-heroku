@@ -12,7 +12,7 @@ class RegionSerializer(serializers.ModelSerializer):
 
 
 class UserProfileSerializer(serializers.ModelSerializer):
-    user = UserProfile()
+    # user = UserProfile()
     location = RegionSerializer(required=False)
     # add image serializer
 
@@ -24,11 +24,12 @@ class UserProfileSerializer(serializers.ModelSerializer):
 
     def validate(self, attrs):
         print(attrs)
-        user = UserProfile.objects.filter(auth_id=attrs.get('auth_id', None)).first()
-        print(user)
-        if not user:
+        user_profile = UserProfile.objects.filter(auth_id=attrs.get('auth_id', None)).first()
+        print(user_profile)
+        if not user_profile:
             raise serializers.ValidationError(
-                {'user': 'UserProfile with this Firebase ID does not exist!'})
+                {'auth_id': 'UserProfile with this Firebase ID does not exist!'})
+
         return attrs
 
 

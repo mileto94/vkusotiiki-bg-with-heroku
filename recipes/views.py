@@ -1,16 +1,32 @@
 from django.contrib.auth.models import User
+from django.shortcuts import HttpResponse, get_object_or_404
+
 from rest_framework import viewsets, status
 from rest_framework.response import Response
-from .serializers import UserSerializer, CategorySerializer, \
-    IngredientSerializer, RegionSerializer, DishSerializer, \
-    RatingSerializer, RecipeSerializer, \
-    RecipeIngredientSerializer, HolidaySerializer, \
-    UserProfileSerializer
 
-from .models import Ingredient, Category, Region, Dish, \
-    Rating, Recipe, RecipeIngredient, Holiday, UserProfile
+from .serializers import (
+    UserSerializer,
+    CategorySerializer,
+    IngredientSerializer,
+    RegionSerializer,
+    DishSerializer,
+    RatingSerializer,
+    RecipeSerializer,
+    RecipeIngredientSerializer,
+    HolidaySerializer,
+    UserProfileSerializer)
 
-from django.shortcuts import HttpResponse
+from .models import (
+    Ingredient,
+    Category,
+    Region,
+    Dish,
+    Rating,
+    Recipe,
+    RecipeIngredient,
+    Holiday,
+    UserProfile)
+
 from firebase.firebase import FirebaseApplication
 
 
@@ -20,6 +36,10 @@ class UserProfileViewSet(viewsets.ModelViewSet):
     """
     queryset = UserProfile.objects.all().order_by('-user__date_joined')
     serializer_class = UserProfileSerializer
+
+    def retrieve(self, request, pk=None):
+        user_profile = get_object_or_404(UserProfile, auth_id=pk)
+        return Response(user_profile.get_serialized())
 
     def list(self, request):
         return Response([u.get_serialized() for u in UserProfile.objects.all()])

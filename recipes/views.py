@@ -297,6 +297,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
 
         # Create Recipe
         recipe, rec_created = Recipe.objects.get_or_create(**data)
+        request.data['total_rate'] = recipe.total_rate
 
         # Validate Ingredients
         for ingr_data in ingredients_data:
@@ -317,8 +318,10 @@ class RecipeViewSet(viewsets.ModelViewSet):
         recipe_serializer = RecipeSerializer(data=request.data)
         if recipe_serializer.is_valid():
             validated = recipe_serializer.data.copy()
-            validated['id'] = recipe.id
-            validated['user'] = user.auth_id
+            validated.update({
+                'id': recipe.id,
+                'user': user.auth_id,
+            })
             return Response(validated, status=status.HTTP_201_CREATED)
         return Response(
             recipe_serializer.errors,

@@ -117,6 +117,7 @@ class RatingSerializer(serializers.ModelSerializer):
 
 class RecipeSerializer(serializers.ModelSerializer):
     ingredients = IngredientSerializer(many=True)
+    total_rate = serializers.SerializerMethodField()
 
     class Meta:
         model = Recipe
@@ -125,6 +126,9 @@ class RecipeSerializer(serializers.ModelSerializer):
         #     'user', 'category', 'dish', 'region', 'ingredients'
         # )
         fields = '__all__'
+
+    def get_total_rate(self, obj):
+        return obj.get('total_rate', 0)
 
 
 class RecipeIngredientSerializer(serializers.ModelSerializer):

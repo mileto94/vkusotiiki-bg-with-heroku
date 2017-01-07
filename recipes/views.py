@@ -178,7 +178,6 @@ class RatingViewSet(viewsets.ModelViewSet):
         serializer = RatingSerializer(Rating.objects.all(), many=True)
         data = serializer.data[::]
         for rating in data:
-            rating.pop('id')
             user_profile = UserProfile.objects.get(id=rating.get('user'))
             rating['user'] = user_profile.auth_id
         return Response(data)
@@ -210,6 +209,7 @@ class RatingViewSet(viewsets.ModelViewSet):
         serializer.is_valid(raise_exception=True)
         data = serializer.data.copy()
         data.update({
+            'id': rating.id,
             'user': userprofile.auth_id
         })
         return Response(
@@ -231,6 +231,8 @@ class RecipeViewSet(viewsets.ModelViewSet):
         )
         data = serializer.data[::]
         for recipe in data:
+            user_profile = UserProfile.objects.get(id=recipe.get('user'))
+            recipe['user'] = user_profile.auth_id
             for ingredient in recipe.get('ingredients'):
                 quantity = RecipeIngredient.objects.get(
                     recipe=recipe.get('id'),
@@ -316,6 +318,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
         if recipe_serializer.is_valid():
             validated = recipe_serializer.data.copy()
             validated['id'] = recipe.id
+            validated['user'] = user.auth_id
             return Response(validated, status=status.HTTP_201_CREATED)
         return Response(
             recipe_serializer.errors,

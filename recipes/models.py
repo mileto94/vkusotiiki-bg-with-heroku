@@ -51,8 +51,7 @@ class UserProfile(models.Model):
 
     def get_serialized(self):
         return OrderedDict({
-            "id": self.id,
-            "auth_id": self.auth_id,
+            "id": self.auth_id,
             "is_business": self.is_business,
             "phone_number": self.phone_number,
             "address": self.address,

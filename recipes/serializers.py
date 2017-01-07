@@ -58,7 +58,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
 
 
 class IngredientSerializer(serializers.ModelSerializer):
-    quantity = serializers.CharField(max_length=10, default='')
+    # quantity = serializers.CharField(max_length=10, default='')
 
     class Meta:
         model = Ingredient

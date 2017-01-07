@@ -83,8 +83,7 @@ class IngredientViewSet(viewsets.ModelViewSet):
     serializer_class = IngredientSerializer
 
     def list(self, request):
-        serializer = IngredientSerializer(Ingredient.objects.all())
-        print('ingredient LIST')
+        serializer = IngredientSerializer(Ingredient.objects.all(), many=True)
         return Response(serializer.data)
 
     def update(self, request, pk=None):
@@ -100,9 +99,6 @@ class IngredientViewSet(viewsets.ModelViewSet):
             'Update ingredient',
             status=status.HTTP_400_BAD_REQUEST)
 
-    def create(self, request, *args, **kwargs):
-        print('Ingr. create')
-
 
 class CategoryViewSet(viewsets.ModelViewSet):
     """
@@ -110,6 +106,10 @@ class CategoryViewSet(viewsets.ModelViewSet):
     """
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
+
+    def list(self, request):
+        serializer = CategorySerializer(Category.objects.all(), many=True)
+        return Response(serializer.data)
 
 
 class RegionViewSet(viewsets.ModelViewSet):
@@ -186,7 +186,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
     serializer_class = RecipeSerializer
 
     def list(self, request):
-        recipes = Recipe.objects.all()
+        recipes = Recipe.objects.all()[:50]
         serializer = RecipeSerializer(
             recipes, many=True
         )

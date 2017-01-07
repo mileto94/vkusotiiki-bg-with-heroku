@@ -47,9 +47,6 @@ class UserProfile(models.Model):
     def __unicode__(self):
         return self.user.get_full_name()
 
-    def __str__(self):
-        return str(self.user)
-
 
 class Category(models.Model):
     """
@@ -64,9 +61,6 @@ class Category(models.Model):
     def __unicode__(self):
         return self.name
 
-    def __str__(self):
-        return self.__unicode__()
-
 
 class Ingredient(models.Model):
     """
@@ -78,9 +72,6 @@ class Ingredient(models.Model):
 
     def __unicode__(self):
         return self.name
-
-    def __str__(self):
-        return self.__unicode__()
 
     @property
     def quantity(self):
@@ -102,9 +93,6 @@ class Region(models.Model):
     def __unicode__(self):
         return self.name
 
-    def __str__(self):
-        return self.__unicode__()
-
 
 class Holiday(models.Model):
     """
@@ -114,9 +102,6 @@ class Holiday(models.Model):
 
     def __unicode__(self):
         return self.name
-
-    def __str__(self):
-        return self.__unicode__()
 
 
 class Rating(models.Model):
@@ -133,9 +118,6 @@ class Rating(models.Model):
     def __unicode__(self):
         return str(self.value)
 
-    def __str__(self):
-        return self.__unicode__()
-
 
 class Dish(models.Model):
     """
@@ -149,9 +131,6 @@ class Dish(models.Model):
 
     def __unicode__(self):
         return self.name
-
-    def __str__(self):
-        return self.__unicode__()
 
 
 class RecipeImage(models.Model):
@@ -208,9 +187,6 @@ class Recipe(models.Model):
     def __unicode__(self):
         return self.name
 
-    def __str__(self):
-        return self.__unicode__()
-
     @property
     def total_rate(self):
         ratings = self.ratings.values_list('value', flat=True)
@@ -238,9 +214,6 @@ class RecipeIngredient(models.Model):
     def __unicode__(self):
         return u'{} {} {}'.format(self.ingredient.name, self.quantity, self.ingredient.unit)
 
-    def __str__(self):
-        return self.__unicode__()
-
 
 class Comment(models.Model):
     """
@@ -252,6 +225,3 @@ class Comment(models.Model):
 
     def __unicode__(self):
         return self.recipe
-
-    def __str__(self):
-        return self.__unicode__()

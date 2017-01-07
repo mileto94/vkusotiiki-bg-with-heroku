@@ -140,10 +140,20 @@ class RecipeViewSet(viewsets.ModelViewSet):
     serializer_class = RecipeSerializer
 
     def list(self, request):
+        recipes = Recipe.objects.all()
         serializer = RecipeSerializer(
-            Recipe.objects.all(), many=True
+            recipes, many=True
         )
-        return Response(serializer.data)
+        data = serializer.data[::]
+        for recipe in data:
+            for ingredient in recipe.get('ingredients'):
+                quantity = RecipeIngredient.objects.get(
+                    recipe=recipe.get('id'),
+                    ingredient=ingredient.get('id')
+                ).quantity
+                ingredient['quantity'] = quantity
+
+        return Response(data)
 
     # def update(self, request, pk=None):
     #     print('RECIPE Update')

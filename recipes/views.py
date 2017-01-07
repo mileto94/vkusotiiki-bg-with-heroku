@@ -120,6 +120,40 @@ class RatingViewSet(viewsets.ModelViewSet):
     queryset = Rating.objects.all()
     serializer_class = RatingSerializer
 
+    def create(self, request, *args, **kwargs):
+        errors = []
+        userprofile = UserProfile.objects.filter(auth_id=request.data.get('user')).first()
+        if not userprofile:
+            errors.append({'user': 'UserProfile with this Firebase ID does not exist!'})
+        else:
+            request.data['user'] = userprofile.id
+
+        recipe = Recipe.objects.filter(id=request.data.get('recipe')).first()
+        if not recipe:
+            errors.append({'recipe': 'A recipe with this ID does not exist!'})
+        if errors:
+            return Response(
+                errors,
+                status=status.HTTP_400_BAD_REQUEST)
+        rating, created = Rating.objects.get_or_create(
+            recipe=recipe,
+            user=userprofile,
+            defaults={
+                'value': request.data.get('value', 1)
+            }
+        )
+
+        serializer = RatingSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        data = serializer.data.copy()
+        data.update({
+            'id': rating.id,
+            'user': userprofile.auth_id
+        })
+        return Response(
+            data,
+            status=status.HTTP_201_CREATED)
+
 
 class RecipeViewSet(viewsets.ModelViewSet):
     """

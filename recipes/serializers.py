@@ -101,7 +101,7 @@ class HolidaySerializer(serializers.ModelSerializer):
         return val
 
 
-class RatingSerializer(serializers.HyperlinkedModelSerializer):
+class RatingSerializer(serializers.ModelSerializer):
     class Meta:
         model = Rating
         fields = '__all__'

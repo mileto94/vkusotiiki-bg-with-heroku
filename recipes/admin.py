@@ -33,6 +33,7 @@ class RecipeAdmin(admin.ModelAdmin):
         'name', 'is_approved', 'region', 'dish', 'difficulty', 'time',
         'modified')
     readonly_fields = ['time', 'modified', 'total_rate']
+    list_filter = ('is_approved', 'region', 'dish', 'difficulty')
 
     inlines = [RecipeIngredientInlineAdmin, RecipeImageInlineAdmin]
 

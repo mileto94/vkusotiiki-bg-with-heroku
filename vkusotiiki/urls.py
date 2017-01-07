@@ -33,7 +33,7 @@ router.register(r'dish', views.DishViewSet)
 router.register(r'holiday', views.HolidayViewSet)
 router.register(r'rating', views.RatingViewSet)
 router.register(r'recipe', views.RecipeViewSet)
-router.register(r'recipe-new', views.RecipeIngredientViewSet)
+# router.register(r'recipe-new', views.RecipeIngredientViewSet)
 
 
 # Wire up our API using automatic URL routing.

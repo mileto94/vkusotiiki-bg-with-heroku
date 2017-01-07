@@ -63,22 +63,40 @@ class IngredientSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class CategorySerializer(serializers.HyperlinkedModelSerializer):
+class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
         fields = '__all__'
 
+    def validate_name(self, val):
+        if not val or Category.objects.filter(name=val).exists():
+            raise serializers.ValidationError(
+                'A category with this name already exists!')
+        return val
 
-class DishSerializer(serializers.HyperlinkedModelSerializer):
+
+class DishSerializer(serializers.ModelSerializer):
     class Meta:
         model = Dish
         fields = '__all__'
+
+    def validate_name(self, val):
+        if not val or Dish.objects.filter(name=val).exists():
+            raise serializers.ValidationError(
+                'A dish with this name already exists!')
+        return val
 
 
 class HolidaySerializer(serializers.ModelSerializer):
     class Meta:
         model = Holiday
         fields = '__all__'
+
+    def validate_name(self, val):
+        if not val or Holiday.objects.filter(name=val).exists():
+            raise serializers.ValidationError(
+                'A holiday with this name already exists!')
+        return val
 
 
 class RatingSerializer(serializers.HyperlinkedModelSerializer):

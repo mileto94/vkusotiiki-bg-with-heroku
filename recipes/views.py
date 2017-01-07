@@ -119,6 +119,10 @@ class RegionViewSet(viewsets.ModelViewSet):
     queryset = Region.objects.all()
     serializer_class = RegionSerializer
 
+    def list(self, request):
+        serializer = RegionSerializer(Region.objects.all(), many=True)
+        return Response(serializer.data)
+
 
 class HolidayViewSet(viewsets.ModelViewSet):
     """
@@ -126,6 +130,10 @@ class HolidayViewSet(viewsets.ModelViewSet):
     """
     queryset = Holiday.objects.all()
     serializer_class = HolidaySerializer
+
+    def list(self, request):
+        serializer = HolidaySerializer(Holiday.objects.all(), many=True)
+        return Response(serializer.data)
 
 
 class DishViewSet(viewsets.ModelViewSet):
@@ -135,6 +143,10 @@ class DishViewSet(viewsets.ModelViewSet):
     queryset = Dish.objects.all()
     serializer_class = DishSerializer
 
+    def list(self, request):
+        serializer = DishSerializer(Dish.objects.all(), many=True)
+        return Response(serializer.data)
+
 
 class RatingViewSet(viewsets.ModelViewSet):
     """
@@ -142,6 +154,14 @@ class RatingViewSet(viewsets.ModelViewSet):
     """
     queryset = Rating.objects.all()
     serializer_class = RatingSerializer
+
+    def list(self, request):
+        serializer = RatingSerializer(Rating.objects.all(), many=True)
+        data = serializer.data[::]
+        for rating in data:
+            user_profile = UserProfile.objects.get(id=rating.get('user'))
+            rating['user'] = user_profile.auth_id
+        return Response(data)
 
     def create(self, request, *args, **kwargs):
         errors = []

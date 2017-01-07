@@ -44,7 +44,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
         model = UserProfile
         fields = (
             'auth_id', 'is_business', 'phone_number', 'address',
-            'location', 'user')
+            'location', 'user', 'recipes')
 
     def validate(self, attrs):
         print(attrs)

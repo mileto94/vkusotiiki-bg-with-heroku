@@ -38,13 +38,22 @@ class UserProfileViewSet(viewsets.ModelViewSet):
     serializer_class = UserProfileSerializer
 
     def retrieve(self, request, pk=None):
+        """
+        Represent single object Firebase ID.
+        """
         user_profile = get_object_or_404(UserProfile, auth_id=pk)
         return Response(user_profile.get_serialized())
 
     def list(self, request):
+        """
+        Represent all objects.
+        """
         return Response([u.get_serialized() for u in UserProfile.objects.all()])
 
     def create(self, request, *args, **kwargs):
+        """
+        Create simple object.
+        """
         data = request.data.copy()
         email = data.get('email')
         first_name, last_name = data.get('name', '').split(' ')
@@ -65,6 +74,16 @@ class UserProfileViewSet(viewsets.ModelViewSet):
         )
 
         return Response(userprofile.get_serialized(), status=status.HTTP_201_CREATED)
+
+    def update(self, request, pk=None):
+        """
+        Update single object via Firebase ID.
+        """
+        user_profile = UserProfile.objects.get(auth_id=pk)
+        favourites = request.data.get('favourites')
+        user_profile.recipes = Recipe.objects.filter(id__in=favourites)
+        user_profile.save()
+        return Response(user_profile.get_serialized(), status=status.HTTP_202_ACCEPTED)
 
 
 class UserViewSet(viewsets.ModelViewSet):

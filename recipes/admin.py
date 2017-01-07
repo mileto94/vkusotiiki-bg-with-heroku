@@ -6,6 +6,7 @@ from .models import Ingredient, Recipe, Category, Region, Rating, Dish, Comment,
 
 class UserProfileInlineAdmin(admin.StackedInline):
     model = UserProfile
+    filter_horizontal = ('recipes', )
 
 
 class UserAdmin(auth.admin.UserAdmin):

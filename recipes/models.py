@@ -45,6 +45,7 @@ class UserProfile(models.Model):
         null=True,
         max_length=200,
         verbose_name='Address for business users.')
+    recipes = models.ManyToManyField('Recipe', blank=True, null=True)
 
     def __unicode__(self):
         return self.user.get_full_name()
@@ -65,7 +66,8 @@ class UserProfile(models.Model):
             "username": self.user.username,
             "email": self.user.email,
             "is_superuser": self.user.is_superuser,
-            "is_staff": self.user.is_staff
+            "is_staff": self.user.is_staff,
+            "favourites": self.recipes.values_list('id', flat=True),
         })
 
 

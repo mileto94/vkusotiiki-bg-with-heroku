@@ -21,6 +21,17 @@ class UserProfileViewSet(viewsets.ModelViewSet):
     queryset = UserProfile.objects.all().order_by('-user__date_joined')
     serializer_class = UserProfileSerializer
 
+    def list(self, request):
+        userprofiles = UserProfile.objects.all()
+        serializer = UserProfileSerializer(
+            userprofiles, many=True
+        )
+        data = serializer.data[::]
+        for profile in data:
+            profile['id'] = profile.pop('auth_id')
+
+        return Response(data)
+
     def create(self, request, *args, **kwargs):
         data = request.data.copy()
         email = data.get('email')

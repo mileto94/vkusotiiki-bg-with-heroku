@@ -128,7 +128,9 @@ class RecipeSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
     def get_total_rate(self, obj):
-        return obj.get('total_rate', 0)
+        if isinstance(obj, dict):
+            return obj.get('total_rate', 0)
+        return obj.total_rate
 
 
 class RecipeIngredientSerializer(serializers.ModelSerializer):

@@ -31,7 +31,7 @@ DATABASES = {
 SECRET_KEY = 'dn0#iyk_ct_@_c0o=u%%ow0^i=1-!&+d^6r_31sp4tf&r*f2%0'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 # Honor the 'X-Forwarded-Proto' header for request.is_secure()
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')

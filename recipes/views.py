@@ -178,6 +178,7 @@ class RatingViewSet(viewsets.ModelViewSet):
         serializer = RatingSerializer(Rating.objects.all(), many=True)
         data = serializer.data[::]
         for rating in data:
+            rating.pop('id')
             user_profile = UserProfile.objects.get(id=rating.get('user'))
             rating['user'] = user_profile.auth_id
         return Response(data)
@@ -209,7 +210,6 @@ class RatingViewSet(viewsets.ModelViewSet):
         serializer.is_valid(raise_exception=True)
         data = serializer.data.copy()
         data.update({
-            'id': rating.id,
             'user': userprofile.auth_id
         })
         return Response(
@@ -250,7 +250,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
 
         # Validate Holiday
         if 'holiday' in data.keys():
-            holiday = Holiday.objects.filter(id=data.get('holiday')).first()
+            holiday, h_cr = Holiday.objects.get_or_create(name=data.get('holiday'))
             if holiday:
                 data['holiday'] = holiday
             else:

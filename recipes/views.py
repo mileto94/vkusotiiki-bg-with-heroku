@@ -22,15 +22,7 @@ class UserProfileViewSet(viewsets.ModelViewSet):
     serializer_class = UserProfileSerializer
 
     def list(self, request):
-        userprofiles = UserProfile.objects.all()
-        serializer = UserProfileSerializer(
-            userprofiles, many=True
-        )
-        data = serializer.data[::]
-        for profile in data:
-            profile['id'] = profile.pop('auth_id')
-
-        return Response(data)
+        return Response([u.get_serialized() for u in UserProfile.objects.all()])
 
     def create(self, request, *args, **kwargs):
         data = request.data.copy()

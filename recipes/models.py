@@ -55,19 +55,17 @@ class UserProfile(models.Model):
             "is_business": self.is_business,
             "phone_number": self.phone_number,
             "address": self.address,
-            "location": {
+            "region": {
                 "id": self.location.id,
                 "name": self.location.name
             },
-            "user": {
-                "id": self.user.id,
-                "first_name": self.user.first_name,
-                "last_name": self.user.last_name,
-                "username": self.user.username,
-                "email": self.user.email,
-                "is_superuser": self.user.is_superuser,
-                "is_staff": self.user.is_staff
-            }
+            "first_name": self.user.first_name,
+            "last_name": self.user.last_name,
+            "name": self.user.get_full_name(),
+            "username": self.user.username,
+            "email": self.user.email,
+            "is_superuser": self.user.is_superuser,
+            "is_staff": self.user.is_staff
         })
 
 

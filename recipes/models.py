@@ -1,3 +1,5 @@
+from collections import OrderedDict
+
 from django.conf import settings
 from django.db import models
 from django.contrib.auth.models import User
@@ -46,6 +48,28 @@ class UserProfile(models.Model):
 
     def __unicode__(self):
         return self.user.get_full_name()
+
+    def get_serialized(self):
+        return OrderedDict({
+            "id": self.id,
+            "auth_id": self.auth_id,
+            "is_business": self.is_business,
+            "phone_number": self.phone_number,
+            "address": self.address,
+            "location": {
+                "id": self.location.id,
+                "name": self.location.name
+            },
+            "user": {
+                "id": self.user.id,
+                "first_name": self.user.first_name,
+                "last_name": self.user.last_name,
+                "username": self.user.username,
+                "email": self.user.email,
+                "is_superuser": self.user.is_superuser,
+                "is_staff": self.user.is_staff
+            }
+        })
 
 
 class Category(models.Model):

@@ -18,7 +18,7 @@ class UserProfileViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows users to be viewed or edited.
     """
-    queryset = UserProfile.objects.all().order_by('-date_joined')
+    queryset = UserProfile.objects.all().order_by('-user__date_joined')
     serializer_class = UserProfileSerializer
 
     def create(self, request, *args, **kwargs):
@@ -28,10 +28,10 @@ class UserProfileViewSet(viewsets.ModelViewSet):
         user, cr = User.objects.get_or_create(email=email, defaults={
             'first_name': first_name,
             'last_name': last_name,
-            'username': email.split('@')[0]
+            'username': email
         })
         region, r_cr = Region.objects.get_or_create(
-            name=data.get('name')
+            name=data.get('region')
         )
         userprofile, pr_cr = UserProfile.objects.get_or_create(
             user=user,
@@ -40,19 +40,8 @@ class UserProfileViewSet(viewsets.ModelViewSet):
                 'auth_id': data.get('id')
             }
         )
-        request.data['userprofile'] = userprofile
-        request.data['region'] = region
 
-        # Validate Recipe
-        profile_serializer = UserProfileSerializer(data={
-                'auth_id': data.get('id'),
-            }
-        )
-        if profile_serializer.is_valid():
-            return Response(profile_serializer.data, status=status.HTTP_201_CREATED)
-        return Response(
-            profile_serializer.errors,
-            status=status.HTTP_400_BAD_REQUEST)
+        return Response(userprofile.get_serialized(), status=status.HTTP_201_CREATED)
 
 
 class UserViewSet(viewsets.ModelViewSet):

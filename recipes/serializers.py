@@ -17,8 +17,26 @@ class RegionSerializer(serializers.ModelSerializer):
         return val
 
 
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = (
+            'id', 'first_name', 'last_name', 'username', 'email',
+            'is_superuser', 'is_staff')
+
+    def validate_email(self, email):
+        if User.objects.filter(email=email).first():
+            raise serializers.ValidationError('A user with this email is already registered!')
+        return email
+
+    def validate_username(self, username):
+        if User.objects.filter(username=username).first():
+            raise serializers.ValidationError('A user with this username is already registered!')
+        return username
+
+
 class UserProfileSerializer(serializers.ModelSerializer):
-    # user = UserProfile()
+    user = UserSerializer(required=False)
     location = RegionSerializer(required=False)
     # add image serializer
 
@@ -26,7 +44,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
         model = UserProfile
         fields = (
             'auth_id', 'is_business', 'phone_number', 'address',
-            'location')
+            'location', 'user')
 
     def validate(self, attrs):
         print(attrs)
@@ -37,28 +55,6 @@ class UserProfileSerializer(serializers.ModelSerializer):
                 {'auth_id': 'UserProfile with this Firebase ID does not exist!'})
 
         return attrs
-
-
-class UserSerializer(serializers.ModelSerializer):
-    userprofile = UserProfileSerializer(many=False)
-
-    class Meta:
-        model = User
-        fields = (
-            'url', 'first_name', 'last_name', 'username', 'email', #'full_name',
-            'groups', 'userprofile', 'is_superuser', 'is_staff')
-
-    # def create(self, validated_data):
-    #     print(validated_data)
-    #     userprofile = validated_data.pop('userprofile')
-    #     user, _ = User.objects.get_or_create(
-    #         email=validated_data.get('email'),
-    #         defaults=validated_data
-    #     )
-    #     if UserProfile.objects.filter(
-    #         auth_id=userprofile.get('auth_id', None),
-    #         user__email=user.email).exists():
-    #         print('haaaaaaaaaaaaaaaaaaaaaa')
 
 
 class IngredientSerializer(serializers.ModelSerializer):

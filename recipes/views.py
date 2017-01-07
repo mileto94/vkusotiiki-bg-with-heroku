@@ -56,7 +56,11 @@ class UserProfileViewSet(viewsets.ModelViewSet):
         """
         data = request.data.copy()
         email = data.get('email')
-        first_name, last_name = data.get('name', '').split(' ')
+        names = data.get('name', '').split(' ')
+        if len(names) > 1:
+            first_name, last_name = names
+        else:
+            first_name, last_name = names[0], ''
         user, cr = User.objects.get_or_create(email=email, defaults={
             'first_name': first_name,
             'last_name': last_name,

@@ -10,6 +10,12 @@ class RegionSerializer(serializers.ModelSerializer):
         model = Region
         fields = '__all__'
 
+    def validate_name(self, val):
+        if not val or Region.objects.filter(name=val).exists():
+            raise serializers.ValidationError(
+                'A region with this name already exists!')
+        return val
+
 
 class UserProfileSerializer(serializers.ModelSerializer):
     # user = UserProfile()
